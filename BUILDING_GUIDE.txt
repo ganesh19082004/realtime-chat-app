@@ -1,0 +1,642 @@
+================================================================================
+       CHATTY — FULLSTACK CHAT APP: STEP-BY-STEP COMPONENT BUILDING GUIDE
+================================================================================
+
+This document explains how each component of the chat application is built,
+what it does, and the overall procedure to construct the app from scratch.
+
+
+================================================================================
+ PHASE 1: PROJECT INITIALIZATION & SETUP
+================================================================================
+
+STEP 1.1 — Initialize the Root Project
+---------------------------------------
+  - Create a root folder: fullstack-chat-app/
+  - Run: npm init -y
+  - Add root package.json with two scripts:
+      "build"  → installs deps for both backend & frontend, builds frontend
+      "start"  → starts the backend server (serves API + frontend in production)
+  - This root package.json orchestrates the entire monorepo.
+
+STEP 1.2 — Initialize the Backend
+-----------------------------------
+  - Create: backend/ folder
+  - Run: cd backend && npm init -y
+  - Set "type": "module" in package.json (enables ES module import/export)
+  - Install production dependencies:
+      express, mongoose, dotenv, cors, cookie-parser, bcryptjs,
+      jsonwebtoken, socket.io, cloudinary
+  - Install dev dependencies:
+      nodemon (auto-restarts server on file changes)
+  - Add scripts:
+      "dev"   → nodemon src/index.js
+      "start" → node src/index.js
+
+STEP 1.3 — Initialize the Frontend
+------------------------------------
+  - Create: frontend/ folder
+  - Scaffold with Vite: npm create vite@latest ./ -- --template react
+  - Install production dependencies:
+      react, react-dom, react-router-dom, axios, zustand,
+      socket.io-client, lucide-react, react-hot-toast
+  - Install dev dependencies:
+      tailwindcss, postcss, autoprefixer, daisyui, eslint + plugins
+  - Configure Tailwind CSS:
+      • tailwind.config.js — content paths, DaisyUI plugin with 32 themes
+      • postcss.config.js  — tailwindcss + autoprefixer plugins
+      • index.css          — @tailwind base/components/utilities directives
+
+STEP 1.4 — Create the .env File (Backend)
+-------------------------------------------
+  - Create: backend/.env
+  - Required variables:
+      PORT=5001
+      MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/chat_db
+      JWT_SECRET=<any-random-secret-string>
+      NODE_ENV=development
+      CLOUDINARY_CLOUD_NAME=<from-cloudinary-dashboard>
+      CLOUDINARY_API_KEY=<from-cloudinary-dashboard>
+      CLOUDINARY_API_SECRET=<from-cloudinary-dashboard>
+  - Add .env to .gitignore so credentials are never committed.
+
+
+================================================================================
+ PHASE 2: BACKEND — DATABASE & LIBRARY SETUP
+================================================================================
+
+STEP 2.1 — Database Connection (backend/src/lib/db.js)
+-------------------------------------------------------
+  PURPOSE: Connects the app to MongoDB Atlas using Mongoose.
+
+  HOW IT WORKS:
+    - Imports mongoose
+    - Exports an async function connectDB()
+    - Calls mongoose.connect(process.env.MONGODB_URI)
+    - Logs the connected host on success, or the error on failure
+    - This function is called AFTER the server starts listening
+
+STEP 2.2 — Cloudinary Configuration (backend/src/lib/cloudinary.js)
+--------------------------------------------------------------------
+  PURPOSE: Configures the Cloudinary SDK for image uploads.
+
+  HOW IT WORKS:
+    - Imports cloudinary v2 from the "cloudinary" package
+    - Loads .env variables via dotenv
+    - Calls cloudinary.config() with cloud_name, api_key, api_secret
+    - Exports the configured cloudinary instance
+    - Used by auth.controller (profile pics) and message.controller (chat images)
+
+STEP 2.3 — JWT Token Utility (backend/src/lib/utils.js)
+---------------------------------------------------------
+  PURPOSE: Generates JWT tokens and sets them as HTTP-only cookies.
+
+  HOW IT WORKS:
+    - Exports generateToken(userId, res)
+    - Creates a JWT with { userId } payload, signed with JWT_SECRET, 7-day expiry
+    - Sets the token as an HTTP-only cookie named "jwt" with:
+        • maxAge: 7 days (in milliseconds)
+        • httpOnly: true   — prevents JavaScript access (XSS protection)
+        • sameSite: strict — prevents CSRF attacks
+        • secure: true in production (HTTPS only)
+    - Returns the token string
+
+STEP 2.4 — Socket.IO Server (backend/src/lib/socket.js)
+---------------------------------------------------------
+  PURPOSE: Sets up real-time WebSocket communication.
+
+  HOW IT WORKS:
+    - Creates an Express app and wraps it in an HTTP server
+    - Attaches Socket.IO to the HTTP server with CORS for localhost:5173
+    - Maintains a userSocketMap object: { userId: socketId }
+    - On "connection" event:
+        • Extracts userId from the handshake query
+        • Stores the mapping: userSocketMap[userId] = socket.id
+        • Broadcasts "getOnlineUsers" to ALL clients with online user IDs
+    - On "disconnect" event:
+        • Removes the user from userSocketMap
+        • Broadcasts updated online users list
+    - Exports getReceiverSocketId(userId) — used to send messages to specific users
+    - Exports io, app, server — used by index.js and controllers
+
+
+================================================================================
+ PHASE 3: BACKEND — DATA MODELS (Mongoose Schemas)
+================================================================================
+
+STEP 3.1 — User Model (backend/src/models/user.model.js)
+----------------------------------------------------------
+  PURPOSE: Defines the structure of a User document in MongoDB.
+
+  SCHEMA FIELDS:
+    - email:      String, required, unique — user's login email
+    - fullName:   String, required — display name
+    - password:   String, required, minlength 6 — bcrypt-hashed password
+    - profilePic: String, default "" — Cloudinary URL for avatar
+    - timestamps: true — auto-adds createdAt and updatedAt fields
+
+STEP 3.2 — Message Model (backend/src/models/message.model.js)
+----------------------------------------------------------------
+  PURPOSE: Defines the structure of a Message document in MongoDB.
+
+  SCHEMA FIELDS:
+    - senderId:   ObjectId (ref: "User"), required — who sent the message
+    - receiverId: ObjectId (ref: "User"), required — who receives the message
+    - text:       String, optional — text content of the message
+    - image:      String, optional — Cloudinary URL for image attachment
+    - timestamps: true — auto-adds createdAt and updatedAt fields
+
+
+================================================================================
+ PHASE 4: BACKEND — MIDDLEWARE
+================================================================================
+
+STEP 4.1 — Auth Middleware (backend/src/middleware/auth.middleware.js)
+----------------------------------------------------------------------
+  PURPOSE: Protects routes so only authenticated users can access them.
+
+  HOW IT WORKS:
+    1. Reads the "jwt" cookie from the incoming request
+    2. If no token → responds 401 "Unauthorized - No Token Provided"
+    3. Verifies the token using jwt.verify() with JWT_SECRET
+    4. If invalid → responds 401 "Unauthorized - Invalid Token"
+    5. Looks up the user in MongoDB by decoded.userId (excludes password)
+    6. If user not found → responds 404 "User not found"
+    7. Attaches the user object to req.user
+    8. Calls next() — allows the request to proceed to the controller
+
+
+================================================================================
+ PHASE 5: BACKEND — CONTROLLERS (Business Logic)
+================================================================================
+
+STEP 5.1 — Auth Controller (backend/src/controllers/auth.controller.js)
+------------------------------------------------------------------------
+  PURPOSE: Handles all authentication-related operations.
+
+  FUNCTIONS:
+
+  signup(req, res):
+    1. Extracts fullName, email, password from request body
+    2. Validates all fields are present, password >= 6 chars
+    3. Checks if email already exists in database
+    4. Hashes the password with bcrypt (salt rounds: 10)
+    5. Creates a new User document and saves to MongoDB
+    6. Generates a JWT token and sets it as an HTTP-only cookie
+    7. Returns user data (id, name, email, profilePic) — never the password
+
+  login(req, res):
+    1. Extracts email, password from request body
+    2. Finds the user by email in MongoDB
+    3. Compares the provided password with the stored hash using bcrypt
+    4. If valid → generates JWT cookie and returns user data
+    5. If invalid → responds 400 "Invalid credentials"
+
+  logout(req, res):
+    1. Clears the "jwt" cookie by setting maxAge to 0
+    2. Returns success message
+
+  updateProfile(req, res):
+    1. Extracts profilePic (base64 image) from request body
+    2. Uploads the image to Cloudinary via cloudinary.uploader.upload()
+    3. Updates the user's profilePic field with the Cloudinary secure_url
+    4. Returns the updated user document
+
+  checkAuth(req, res):
+    1. Simply returns req.user (set by the auth middleware)
+    2. Used by the frontend on app load to check if user is still logged in
+
+STEP 5.2 — Message Controller (backend/src/controllers/message.controller.js)
+-------------------------------------------------------------------------------
+  PURPOSE: Handles all messaging operations.
+
+  FUNCTIONS:
+
+  getUsersForSidebar(req, res):
+    1. Gets the logged-in user's ID from req.user._id
+    2. Queries MongoDB for ALL users EXCEPT the logged-in user
+    3. Excludes the password field from results
+    4. Returns the array of users (displayed in the sidebar)
+
+  getMessages(req, res):
+    1. Extracts the target user's ID from req.params.id
+    2. Queries MongoDB for all messages WHERE:
+       (senderId = me AND receiverId = them) OR (senderId = them AND receiverId = me)
+    3. Returns the full conversation array sorted by creation time
+
+  sendMessage(req, res):
+    1. Extracts text and image from request body, receiverId from params
+    2. If image is provided → uploads to Cloudinary, gets the URL
+    3. Creates a new Message document with senderId, receiverId, text, image
+    4. Saves to MongoDB
+    5. Checks if the receiver is online using getReceiverSocketId()
+    6. If online → emits "newMessage" event directly to their socket
+    7. Returns the created message
+
+
+================================================================================
+ PHASE 6: BACKEND — ROUTES
+================================================================================
+
+STEP 6.1 — Auth Routes (backend/src/routes/auth.route.js)
+-----------------------------------------------------------
+  Maps HTTP endpoints to auth controller functions:
+
+    POST   /api/auth/signup          → signup()           (public)
+    POST   /api/auth/login           → login()            (public)
+    POST   /api/auth/logout          → logout()           (public)
+    PUT    /api/auth/update-profile  → updateProfile()    (protected)
+    GET    /api/auth/check           → checkAuth()        (protected)
+
+  Protected routes use the protectRoute middleware.
+
+STEP 6.2 — Message Routes (backend/src/routes/message.route.js)
+-----------------------------------------------------------------
+  Maps HTTP endpoints to message controller functions:
+
+    GET    /api/messages/users       → getUsersForSidebar() (protected)
+    GET    /api/messages/:id         → getMessages()        (protected)
+    POST   /api/messages/send/:id   → sendMessage()        (protected)
+
+  ALL message routes are protected — require valid JWT.
+
+
+================================================================================
+ PHASE 7: BACKEND — SERVER ENTRY POINT
+================================================================================
+
+STEP 7.1 — Server Setup (backend/src/index.js)
+------------------------------------------------
+  PURPOSE: Wires everything together and starts the server.
+
+  PROCEDURE:
+    1. Imports express, dotenv, cookie-parser, cors, path
+    2. Imports connectDB, auth routes, message routes
+    3. Imports app and server from socket.js (NOT creating new ones)
+    4. Calls dotenv.config() to load .env variables
+    5. Configures middleware:
+       - express.json()       — parses JSON request bodies
+       - cookieParser()       — parses cookies from requests
+       - cors()               — allows requests from http://localhost:5173
+    6. Mounts routes:
+       - /api/auth      → auth routes
+       - /api/messages   → message routes
+    7. In production mode:
+       - Serves the frontend build from ../frontend/dist/
+       - Catches all non-API routes and serves index.html (SPA routing)
+    8. Starts the HTTP server on process.env.PORT
+    9. Calls connectDB() to establish MongoDB connection
+
+
+================================================================================
+ PHASE 8: FRONTEND — CONFIGURATION & UTILITIES
+================================================================================
+
+STEP 8.1 — Axios Instance (frontend/src/lib/axios.js)
+-------------------------------------------------------
+  PURPOSE: Creates a pre-configured Axios HTTP client.
+
+  HOW IT WORKS:
+    - Sets baseURL to "http://localhost:5001/api" in development
+    - Sets baseURL to "/api" in production (same origin)
+    - Sets withCredentials: true — sends cookies with every request
+    - All API calls throughout the app use this single instance
+
+STEP 8.2 — Utility Functions (frontend/src/lib/utils.js)
+----------------------------------------------------------
+  PURPOSE: Provides reusable helper functions.
+
+  FUNCTION:
+    formatMessageTime(date):
+      - Converts a date string to "HH:MM" format (24-hour, no seconds)
+      - Used in ChatContainer to display message timestamps
+
+STEP 8.3 — Constants (frontend/src/constants/index.js)
+-------------------------------------------------------
+  PURPOSE: Stores application-wide constants.
+
+  CONTENTS:
+    - THEMES array — list of all 32 DaisyUI theme names
+    - Used by the SettingsPage to render theme preview cards
+
+
+================================================================================
+ PHASE 9: FRONTEND — STATE MANAGEMENT (Zustand Stores)
+================================================================================
+
+STEP 9.1 — Auth Store (frontend/src/store/useAuthStore.js)
+------------------------------------------------------------
+  PURPOSE: Manages authentication state and WebSocket connection.
+
+  STATE:
+    - authUser           — current logged-in user object (null if logged out)
+    - isSigningUp        — loading state for signup
+    - isLoggingIn        — loading state for login
+    - isUpdatingProfile  — loading state for profile update
+    - isCheckingAuth     — loading state for initial auth check
+    - onlineUsers        — array of online user IDs (from Socket.IO)
+    - socket             — Socket.IO client instance
+
+  ACTIONS:
+    checkAuth():   GET /auth/check → sets authUser, connects socket
+    signup(data):  POST /auth/signup → sets authUser, shows toast, connects socket
+    login(data):   POST /auth/login → sets authUser, shows toast, connects socket
+    logout():      POST /auth/logout → clears authUser, disconnects socket
+    updateProfile(data): PUT /auth/update-profile → updates authUser
+    connectSocket():     Creates Socket.IO connection with userId query param,
+                         listens for "getOnlineUsers" events
+    disconnectSocket():  Disconnects the socket
+
+STEP 9.2 — Chat Store (frontend/src/store/useChatStore.js)
+------------------------------------------------------------
+  PURPOSE: Manages chat state, messages, and real-time message subscriptions.
+
+  STATE:
+    - messages           — array of messages in the current conversation
+    - users              — array of all users (for sidebar)
+    - selectedUser       — the user currently being chatted with
+    - isUsersLoading     — loading state for user list
+    - isMessagesLoading  — loading state for message history
+
+  ACTIONS:
+    getUsers():             GET /messages/users → populates sidebar
+    getMessages(userId):    GET /messages/:id → loads conversation history
+    sendMessage(data):      POST /messages/send/:id → sends message, appends to state
+    subscribeToMessages():  Listens for "newMessage" socket event, appends incoming
+                            messages to the messages array (only from selected user)
+    unsubscribeFromMessages(): Removes "newMessage" listener (cleanup)
+    setSelectedUser(user):  Sets the active conversation
+
+STEP 9.3 — Theme Store (frontend/src/store/useThemeStore.js)
+--------------------------------------------------------------
+  PURPOSE: Manages the selected UI theme with localStorage persistence.
+
+  STATE:
+    - theme — current theme name (default: "coffee")
+
+  ACTIONS:
+    setTheme(theme): Saves to localStorage, updates Zustand state
+                     The App component applies it via data-theme attribute
+
+
+================================================================================
+ PHASE 10: FRONTEND — COMPONENTS
+================================================================================
+
+STEP 10.1 — Navbar (frontend/src/components/Navbar.jsx)
+---------------------------------------------------------
+  PURPOSE: Top navigation bar visible on all pages.
+
+  FEATURES:
+    - App logo and "Chatty" brand name (links to home)
+    - Navigation links: Settings (always), Profile (if logged in), Logout button
+    - Uses Lucide icons: MessageSquare, Settings, User, LogOut
+
+STEP 10.2 — Sidebar (frontend/src/components/Sidebar.jsx)
+-----------------------------------------------------------
+  PURPOSE: Displays the list of contacts/users to chat with.
+
+  FEATURES:
+    - Fetches all users on mount via getUsers()
+    - Shows each user with avatar, name, and online/offline status
+    - Green dot indicator for online users (checks onlineUsers array)
+    - "Show online only" checkbox filter
+    - Highlights the currently selected user
+    - Responsive: shows only avatars on mobile, full info on desktop
+    - Displays SidebarSkeleton while loading
+
+STEP 10.3 — ChatContainer (frontend/src/components/ChatContainer.jsx)
+-----------------------------------------------------------------------
+  PURPOSE: Displays the message history for the selected conversation.
+
+  FEATURES:
+    - Fetches messages on mount and when selected user changes
+    - Subscribes to real-time "newMessage" events via Socket.IO
+    - Unsubscribes on cleanup (useEffect return)
+    - Renders each message as a chat bubble (DaisyUI chat component)
+    - Aligns sent messages to the right, received to the left
+    - Shows sender/receiver avatar and timestamp
+    - Supports both text and image messages
+    - Auto-scrolls to the latest message using a ref + scrollIntoView
+    - Shows MessageSkeleton while loading
+
+STEP 10.4 — ChatHeader (frontend/src/components/ChatHeader.jsx)
+-----------------------------------------------------------------
+  PURPOSE: Shows info about the selected chat user at the top.
+
+  FEATURES:
+    - Displays the selected user's avatar, name, and online/offline status
+    - Close button (X icon) to deselect the user and go back to sidebar
+
+STEP 10.5 — MessageInput (frontend/src/components/MessageInput.jsx)
+---------------------------------------------------------------------
+  PURPOSE: Input form for sending text and image messages.
+
+  FEATURES:
+    - Text input field with placeholder "Type a message..."
+    - Image upload button — opens file picker, validates image type
+    - Image preview with remove (X) button before sending
+    - Converts selected image to base64 using FileReader
+    - Send button — disabled when both text and image are empty
+    - On submit: calls sendMessage(), then clears text and image preview
+    - Uses Lucide icons: Image, Send, X
+
+STEP 10.6 — NoChatSelected (frontend/src/components/NoChatSelected.jsx)
+-------------------------------------------------------------------------
+  PURPOSE: Placeholder shown when no conversation is selected.
+
+  FEATURES:
+    - Displays a welcome message: "Welcome! Select a conversation to start chatting"
+    - Animated chat icon (bounce animation)
+    - Shows the authenticated user's name
+
+STEP 10.7 — AuthImagePattern (frontend/src/components/AuthImagePattern.jsx)
+-----------------------------------------------------------------------------
+  PURPOSE: Decorative visual pattern shown on the login and signup pages.
+
+  FEATURES:
+    - 3x3 grid of rounded squares with alternating opacity
+    - Creates a visually appealing pattern on the right side of auth forms
+    - Displays a title and subtitle passed as props
+
+
+================================================================================
+ PHASE 11: FRONTEND — PAGES
+================================================================================
+
+STEP 11.1 — SignUpPage (frontend/src/pages/SignUpPage.jsx)
+------------------------------------------------------------
+  PURPOSE: User registration form.
+
+  LAYOUT:
+    - Left side: Registration form (fullName, email, password fields)
+    - Right side: AuthImagePattern decorative panel (hidden on mobile)
+
+  FLOW:
+    1. User fills in Full Name, Email, Password
+    2. Client-side validation (all fields required, password >= 6 chars)
+    3. Calls useAuthStore.signup(formData)
+    4. On success → auto-redirects to home (via auth guard in App.jsx)
+    5. On error → shows toast notification with error message
+    6. "Already have an account?" link to /login
+
+STEP 11.2 — LoginPage (frontend/src/pages/LoginPage.jsx)
+-----------------------------------------------------------
+  PURPOSE: User login form.
+
+  LAYOUT:
+    - Left side: Login form (email, password fields)
+    - Right side: AuthImagePattern decorative panel (hidden on mobile)
+
+  FLOW:
+    1. User enters Email and Password
+    2. Calls useAuthStore.login(formData)
+    3. On success → auto-redirects to home, connects WebSocket
+    4. On error → shows toast with "Invalid credentials"
+    5. "Don't have an account?" link to /signup
+
+STEP 11.3 — HomePage (frontend/src/pages/HomePage.jsx)
+--------------------------------------------------------
+  PURPOSE: Main chat interface — the core of the application.
+
+  LAYOUT:
+    - Full-height container with rounded corners and shadow
+    - Left panel: Sidebar (user contacts list)
+    - Right panel: ChatContainer (if a user is selected) or NoChatSelected
+
+  FLOW:
+    1. Sidebar loads all users
+    2. User clicks a contact → setSelectedUser()
+    3. ChatContainer loads and displays the conversation
+    4. Real-time messages appear instantly via Socket.IO
+
+STEP 11.4 — ProfilePage (frontend/src/pages/ProfilePage.jsx)
+--------------------------------------------------------------
+  PURPOSE: View and edit user profile.
+
+  FEATURES:
+    - Displays current avatar (or default avatar.png)
+    - Camera icon overlay to upload a new profile picture
+    - On image select → converts to base64, calls updateProfile()
+    - Shows user info: Full Name, Email
+    - Shows account metadata: Member Since date, Account Status
+
+STEP 11.5 — SettingsPage (frontend/src/pages/SettingsPage.jsx)
+----------------------------------------------------------------
+  PURPOSE: Theme customization page.
+
+  FEATURES:
+    - Displays all 32 DaisyUI themes as clickable preview cards
+    - Each card shows a mini chat bubble preview with the theme colors
+    - Currently active theme is highlighted with a checkmark
+    - Theme selection persists via localStorage (useThemeStore)
+    - Theme applies globally via the data-theme attribute on root div
+
+
+================================================================================
+ PHASE 12: FRONTEND — APP ENTRY POINT & ROUTING
+================================================================================
+
+STEP 12.1 — Main Entry (frontend/src/main.jsx)
+------------------------------------------------
+  PURPOSE: React application bootstrap.
+
+  WHAT IT DOES:
+    - Wraps the App component in BrowserRouter (enables client-side routing)
+    - Renders into the #root DOM element
+    - This is the first file Vite executes
+
+STEP 12.2 — App Component (frontend/src/App.jsx)
+--------------------------------------------------
+  PURPOSE: Root component that handles routing and auth state.
+
+  WHAT IT DOES:
+    1. On mount → calls checkAuth() to verify if user has a valid JWT cookie
+    2. While checking → shows a full-screen loading spinner
+    3. Applies the selected theme via data-theme attribute
+    4. Renders the Navbar (always visible)
+    5. Defines routes with auth guards:
+       /         → HomePage     (requires auth, else redirect to /login)
+       /signup   → SignUpPage   (only if NOT authenticated)
+       /login    → LoginPage    (only if NOT authenticated)
+       /settings → SettingsPage (always accessible)
+       /profile  → ProfilePage  (requires auth)
+    6. Renders the Toaster component for notifications
+
+
+================================================================================
+ PHASE 13: RUNNING THE APPLICATION
+================================================================================
+
+STEP 13.1 — Development Mode
+------------------------------
+  Terminal 1 (Backend):
+    cd backend
+    npm run dev
+    → Starts Express + Socket.IO on port 5001 with nodemon hot-reload
+
+  Terminal 2 (Frontend):
+    cd frontend
+    npm run dev
+    → Starts Vite dev server on port 5173 with HMR (Hot Module Replacement)
+
+  Open browser: http://localhost:5173
+
+STEP 13.2 — Production Mode
+-----------------------------
+  From root directory:
+    npm run build   → Installs all deps + builds frontend into frontend/dist/
+    npm run start   → Starts Express which serves API + static frontend files
+
+STEP 13.3 — Testing the App
+-----------------------------
+  1. Open http://localhost:5173 in two different browser windows
+  2. Create two separate accounts (different emails)
+  3. Log in as User A in Window 1, User B in Window 2
+  4. Both users should appear in each other's sidebar with green "Online" dots
+  5. Click on the other user to open the conversation
+  6. Send a text message → it should appear instantly in both windows
+  7. Send an image → it uploads to Cloudinary and appears in chat
+  8. Log out one user → the other's sidebar should show them as "Offline"
+
+
+================================================================================
+ COMPLETE DATA FLOW: SENDING A MESSAGE
+================================================================================
+
+  1. User types text and/or attaches an image in MessageInput component
+  2. On submit → useChatStore.sendMessage({ text, image }) is called
+  3. Axios sends POST /api/messages/send/:receiverId with JWT cookie
+  4. Backend auth middleware validates the JWT, attaches req.user
+  5. message.controller.sendMessage():
+     a. If image → uploads base64 to Cloudinary, gets URL
+     b. Creates Message document in MongoDB
+     c. Checks if receiver is online via userSocketMap
+     d. If online → emits "newMessage" to receiver's specific socket
+  6. Sender's frontend: Axios response returns → message appended to state
+  7. Receiver's frontend: Socket "newMessage" event fires →
+     subscribeToMessages() handler appends message to state
+  8. Both ChatContainer components re-render with the new message
+  9. Auto-scroll moves the view to the latest message
+
+
+================================================================================
+ COMPLETE AUTH FLOW: LOGIN TO CHAT
+================================================================================
+
+  1. User enters email + password on LoginPage
+  2. useAuthStore.login() sends POST /api/auth/login
+  3. Backend validates credentials, generates JWT, sets HTTP-only cookie
+  4. Frontend receives user data → sets authUser in Zustand store
+  5. App.jsx auth guard detects authUser → redirects to HomePage
+  6. connectSocket() creates Socket.IO connection with userId query
+  7. Backend socket.js receives connection → stores in userSocketMap
+  8. Backend broadcasts "getOnlineUsers" to ALL connected clients
+  9. All clients update their onlineUsers state → green dots appear
+  10. Sidebar loads via getUsers() → shows all contacts
+  11. User is now fully authenticated and ready to chat
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
