@@ -1,16 +1,13 @@
 <div align="center">
-
-# 💬 Chatty — Fullstack Real-Time Chat Application
-
-A modern, feature-rich real-time chat application built with the **MERN Stack** and **Socket.IO**. Chatty delivers instant messaging, online user tracking, image sharing, theme customization, and secure JWT-based authentication — all wrapped in a sleek, responsive UI.
-
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
-
+  <h1>💬 Chatty — Fullstack Real-Time Chat Application</h1>
+  <p>A modern, feature-rich real-time chat application built with the <b>MERN Stack</b> and <b>Socket.IO</b>.<br/>Chatty delivers instant messaging, online user tracking, image sharing, theme customization, and secure JWT-based authentication — all wrapped in a sleek, responsive UI.</p>
+  <br/>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js"/></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/></a>
+  <a href="https://www.mongodb.com/"><img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/></a>
+  <a href="https://socket.io/"><img src="https://img.shields.io/badge/Socket.IO-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white" alt="Socket.IO"/></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License: MIT"/></a>
 </div>
 
 ---
@@ -373,9 +370,8 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ---
 
 <div align="center">
-
-**Built with ❤️ using the MERN Stack**
-
-⭐ Star this repo if you found it helpful!
-
+  <b>Built with ❤️ using the MERN Stack</b>
+  <br/><br/>
+  ⭐ Star this repo if you found it helpful!
 </div>
+
