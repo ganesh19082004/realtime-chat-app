@@ -1,252 +1,314 @@
-<![CDATA[<div align="center">
+<div align="center">
 
-# 💬 Chatty — Fullstack Real-Time Chat Application
+# 💬 Chatty
 
-A modern, feature-rich real-time chat application built with the **MERN Stack** and **Socket.IO**. Chatty delivers instant messaging, online user tracking, image sharing, theme customization, and secure JWT-based authentication — all wrapped in a sleek, responsive UI.
+Real-time messaging for modern teams and communities, built with a production-style MERN stack and Socket.IO.
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Overview
 
-- [✨ Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [📁 Project Structure](#-project-structure)
-- [⚙️ Prerequisites](#️-prerequisites)
-- [🚀 Getting Started](#-getting-started)
-- [🔑 Environment Variables](#-environment-variables)
-- [📡 API Endpoints](#-api-endpoints)
-- [🔌 WebSocket Events](#-websocket-events)
-- [🎨 Theming](#-theming)
-- [🏗️ Architecture Overview](#️-architecture-overview)
-- [📦 Deployment](#-deployment)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+Chatty is a full-stack real-time chat application designed to mirror a production-ready messaging platform. It combines a secure backend API, persistent MongoDB storage, live socket-based messaging, and a responsive React frontend powered by Vite and Tailwind CSS.
+
+The project includes user authentication, online presence tracking, media sharing, profile customization, and a polished multi-theme UI that supports a modern messaging experience.
 
 ---
 
-## ✨ Features
+## Key Features
 
-| Feature | Description |
-|---|---|
-| 🔐 **Authentication** | Secure signup, login & logout with JWT tokens stored in HTTP-only cookies |
-| 💬 **Real-Time Messaging** | Instant message delivery powered by Socket.IO WebSockets |
-| 🟢 **Online Status** | Live tracking of online/offline users with green indicator dots |
-| 🖼️ **Image Sharing** | Send images in chat — uploaded and hosted via Cloudinary CDN |
-| 👤 **Profile Management** | Update profile picture with Cloudinary integration |
-| 🎨 **32 Themes** | Choose from 32 beautiful DaisyUI themes with live preview |
-| 📱 **Responsive Design** | Fully responsive layout — works on desktop, tablet & mobile |
-| 🔔 **Toast Notifications** | User-friendly success/error notifications via React Hot Toast |
-| ⚡ **Auto-Scroll** | Chat window automatically scrolls to the latest message |
-| 🛡️ **Route Protection** | Protected routes ensure only authenticated users access the app |
+- Secure authentication with JWT and cookie-based session handling
+- Real-time messaging using Socket.IO
+- Online/offline user presence indicators
+- Image upload and sharing with Cloudinary
+- Profile photo updates and user personalization
+- Theme switching with DaisyUI and local persistence
+- Responsive chat interface for desktop and mobile layouts
+- Protected routes and middleware-based access control
+- Clean state handling with Zustand
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
-| Technology | Purpose |
-|---|---|
-| **Node.js** | JavaScript runtime |
-| **Express.js** | Web framework for REST API |
-| **MongoDB + Mongoose** | NoSQL database & ODM |
-| **Socket.IO** | Real-time bidirectional communication |
-| **JSON Web Tokens (JWT)** | Stateless authentication |
-| **bcrypt.js** | Password hashing |
-| **Cloudinary** | Cloud-based image storage |
-| **cookie-parser** | Parse HTTP cookies |
-| **dotenv** | Environment variable management |
-| **CORS** | Cross-Origin Resource Sharing |
+
+- Node.js
+- Express.js
+- MongoDB + Mongoose
+- Socket.IO
+- JWT (JSON Web Tokens)
+- bcryptjs
+- Cloudinary
+- cookie-parser
+- cors
+- dotenv
 
 ### Frontend
-| Technology | Purpose |
-|---|---|
-| **React 18** | Component-based UI library |
-| **Vite** | Lightning-fast build tool & dev server |
-| **React Router DOM v6** | Client-side routing & navigation |
-| **Zustand** | Lightweight state management |
-| **Socket.IO Client** | WebSocket client for real-time features |
-| **Axios** | HTTP client for API requests |
-| **Tailwind CSS** | Utility-first CSS framework |
-| **DaisyUI** | Tailwind CSS component library with 32 themes |
-| **Lucide React** | Beautiful & consistent icon library |
-| **React Hot Toast** | Toast notification library |
+
+- React 18
+- Vite
+- React Router DOM
+- Zustand
+- Axios
+- Socket.IO Client
+- Tailwind CSS
+- DaisyUI
+- Lucide React
+- React Hot Toast
 
 ---
 
-## 📁 Project Structure
+## Architecture
 
+```text
+Client (React + Vite)
+        │
+        ├── REST API calls via Axios
+        │
+        ├── Socket.IO client for real-time events
+        │
+        ▼
+Express + Node.js API
+        │
+        ├── Auth routes and middleware
+        ├── Message routes and controllers
+        ├── Socket.IO server integration
+        ▼
+MongoDB (Mongoose models)
+        │
+        └── Cloudinary for media storage
 ```
-fullstack-chat-app/
+
+This architecture keeps the frontend lightweight while ensuring chat communication, auth validation, and persistence remain fast and scalable for a single-service application.
+
+---
+
+## Project Structure
+
+```text
+fullstack-chat-app-master/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/
-│   │   │   ├── auth.controller.js      # Signup, login, logout, profile update
-│   │   │   └── message.controller.js   # Send messages, get conversations
+│   │   │   ├── auth.controller.js
+│   │   │   └── message.controller.js
 │   │   ├── lib/
-│   │   │   ├── cloudinary.js           # Cloudinary SDK configuration
-│   │   │   ├── db.js                   # MongoDB connection setup
-│   │   │   ├── socket.js              # Socket.IO server configuration
-│   │   │   └── utils.js               # JWT token generation utility
+│   │   │   ├── cloudinary.js
+│   │   │   ├── db.js
+│   │   │   ├── socket.js
+│   │   │   └── utils.js
 │   │   ├── middleware/
-│   │   │   └── auth.middleware.js      # JWT verification & route protection
+│   │   │   └── auth.middleware.js
 │   │   ├── models/
-│   │   │   ├── message.model.js        # Message schema (sender, receiver, text, image)
-│   │   │   └── user.model.js           # User schema (email, name, password, profilePic)
+│   │   │   ├── message.model.js
+│   │   │   └── user.model.js
 │   │   ├── routes/
-│   │   │   ├── auth.route.js           # Authentication routes
-│   │   │   └── message.route.js        # Messaging routes
+│   │   │   ├── auth.route.js
+│   │   │   └── message.route.js
 │   │   ├── seeds/
-│   │   │   └── user.seed.js            # Database seed data
-│   │   └── index.js                    # Express app entry point
+│   │   │   └── user.seed.js
+│   │   └── index.js
 │   ├── package.json
-│   └── .env                            # Environment variables (not committed)
-│
+│   └── .env
 ├── frontend/
 │   ├── public/
-│   │   └── avatar.png                  # Default user avatar
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── AuthImagePattern.jsx    # Decorative pattern for auth pages
-│   │   │   ├── ChatContainer.jsx       # Main chat message display area
-│   │   │   ├── ChatHeader.jsx          # Selected user info header
-│   │   │   ├── MessageInput.jsx        # Text & image message input form
-│   │   │   ├── Navbar.jsx              # Top navigation bar
-│   │   │   ├── NoChatSelected.jsx      # Placeholder when no chat is open
-│   │   │   ├── Sidebar.jsx             # User contacts list with online filter
-│   │   │   └── skeletons/              # Loading skeleton components
 │   │   ├── constants/
-│   │   │   └── index.js                # Theme list & app constants
 │   │   ├── lib/
-│   │   │   ├── axios.js                # Axios instance with base URL config
-│   │   │   └── utils.js                # Date formatting utilities
 │   │   ├── pages/
-│   │   │   ├── HomePage.jsx            # Main chat interface (Sidebar + ChatContainer)
-│   │   │   ├── LoginPage.jsx           # User login form
-│   │   │   ├── SignUpPage.jsx          # User registration form
-│   │   │   ├── ProfilePage.jsx         # User profile management
-│   │   │   └── SettingsPage.jsx        # Theme selection settings
 │   │   ├── store/
-│   │   │   ├── useAuthStore.js         # Auth state, socket connection management
-│   │   │   ├── useChatStore.js         # Chat state, messages, real-time subscriptions
-│   │   │   └── useThemeStore.js        # Theme persistence with localStorage
-│   │   ├── App.jsx                     # Root component with routes & auth checks
-│   │   ├── main.jsx                    # React entry point with BrowserRouter
-│   │   └── index.css                   # Global styles & Tailwind imports
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
 │   ├── index.html
+│   ├── package.json
 │   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── package.json
-│
-├── package.json                         # Root scripts (build & start)
+│   └── tailwind.config.js
+├── package.json
 ├── LICENSE
-└── README.md
+├── README.md
+└── BUILDING_GUIDE.txt
 ```
 
 ---
 
-## ⚙️ Prerequisites
+## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before running the project locally, make sure you have:
 
-- **Node.js** v18 or higher — [Download](https://nodejs.org/)
-- **npm** v9 or higher (comes with Node.js)
-- **MongoDB Atlas** account — [Sign up free](https://www.mongodb.com/cloud/atlas)
-- **Cloudinary** account — [Sign up free](https://cloudinary.com/) *(for image uploads)*
-- **Git** — [Download](https://git-scm.com/)
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/fullstack-chat-app.git
-cd fullstack-chat-app
-```
-
-### 2. Install Dependencies
-
-```bash
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file in the `backend/` directory:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-Then fill in your credentials (see [Environment Variables](#-environment-variables) below).
-
-### 4. Start Development Servers
-
-**Terminal 1 — Backend:**
-```bash
-cd backend
-npm run dev
-```
-> Backend runs on `http://localhost:5001` with nodemon hot-reload.
-
-**Terminal 2 — Frontend:**
-```bash
-cd frontend
-npm run dev
-```
-> Frontend runs on `http://localhost:5173` with Vite HMR.
-
-### 5. Open the App
-
-Navigate to **http://localhost:5173** in your browser. Create an account and start chatting! 🎉
+- Node.js 18+
+- npm 9+
+- MongoDB instance or MongoDB Atlas cluster
+- Cloudinary account for image uploads
+- Git
 
 ---
 
-## 🔑 Environment Variables
+## Getting Started
 
-Create a `.env` file inside the `backend/` directory with the following variables:
+### 1) Clone the repository
 
-| Variable | Description | Example |
-|---|---|---|
-| `PORT` | Backend server port | `5001` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/chat_db` |
-| `JWT_SECRET` | Secret key for signing JWT tokens | `your-super-secret-key-here` |
-| `NODE_ENV` | Environment mode | `development` |
-| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name | `dxxxxxxxxx` |
-| `CLOUDINARY_API_KEY` | Your Cloudinary API key | `123456789012345` |
-| `CLOUDINARY_API_SECRET` | Your Cloudinary API secret | `abcdefghijk-lmnopqrst` |
+```bash
+git clone https://github.com/your-username/chatty.git
+cd chatty
+```
+
+### 2) Install dependencies
+
+```bash
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+### 3) Create environment variables
+
+Create a `.env` file in the `backend` directory with the following values:
 
 ```env
 PORT=5001
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/chat_db
-JWT_SECRET=your-super-secret-key-here
+MONGODB_URI=mongodb://127.0.0.1:27017/chat_db
+JWT_SECRET=your_super_secret_key
 NODE_ENV=development
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-For local development, use a local MongoDB URI like `mongodb://127.0.0.1:27017/chat_db`. If you prefer MongoDB Atlas, replace the placeholders in `MONGODB_URI` with your real Atlas username, password, and cluster hostname. If your password contains reserved URL characters such as `@`, `:`, `/`, or `#`, URL-encode it before pasting it into the connection string.
+> Keep this file local and never commit it to source control.
 
-> ⚠️ **Important:** Never commit your `.env` file. It is already included in `.gitignore`.
+### 4) Start the application
+
+Run the backend:
+
+```bash
+npm run dev --prefix backend
+```
+
+Run the frontend in a second terminal:
+
+```bash
+npm run dev --prefix frontend
+```
+
+Then open the app in your browser at:
+
+```text
+http://localhost:5173
+```
 
 ---
+
+## Production Build
+
+From the root directory:
+
+```bash
+npm run build
+```
+
+This installs the backend and frontend dependencies, then builds the frontend bundle for production.
+
+To run the production server:
+
+```bash
+npm run start --prefix backend
+```
+
+---
+
+## API Overview
+
+### Authentication
+
+- `POST /api/auth/signup` — Register a new user
+- `POST /api/auth/login` — Authenticate a user
+- `POST /api/auth/logout` — Clear the auth cookie
+- `GET /api/auth/check` — Validate the current session
+- `PUT /api/auth/update-profile` — Update profile details or image
+
+### Messaging
+
+- `GET /api/messages/users` — List available chat users
+- `GET /api/messages/:id` — Fetch message history with a specific user
+- `POST /api/messages/send/:id` — Send a text or image message
+
+These routes are protected by JWT middleware and are intended to support a real-time chat workflow with secure access control.
+
+---
+
+## Real-Time Behavior
+
+The app uses Socket.IO for live interactions, including:
+
+- user connection tracking
+- online user updates
+- new message delivery to connected clients
+- event-driven updates without full page reloads
+
+This makes the chat experience feel immediate and close to a production messaging product.
+
+---
+
+## UI and Experience
+
+The frontend is designed around a clean conversation-first layout, with:
+
+- sidebar-based contact list
+- active chat panel with message history
+- theme switching from the settings page
+- responsive layout using Tailwind CSS
+- toast feedback for user actions
+- loading skeletons for smoother visual transitions
+
+---
+
+## Deployment Notes
+
+For deployment, configure the same environment variables and set `NODE_ENV=production` in your hosting platform.
+
+Recommended setup:
+
+- MongoDB Atlas for persistence
+- Cloudinary for image hosting
+- Render, Railway, or any Node-compatible hosting provider
+- HTTPS enabled for secure cookie transmission
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your work with a clear message
+4. Push the branch and open a pull request
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Built with ❤️ using the MERN stack and real-time communication tools.
+
+</div>
+
 
 ## 📡 API Endpoints
 
