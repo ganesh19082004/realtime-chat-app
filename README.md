@@ -1,336 +1,184 @@
-<div align="center">
+﻿<div align="center">
 
-# 💬 Chatty
+<h1>💬 Chatty</h1>
 
-Real-time messaging for modern teams and communities, built with a production-style MERN stack and Socket.IO.
+<p><strong>A production-grade, full-stack real-time chat application built with the MERN stack and Socket.IO</strong></p>
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+<p>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js"/></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/></a>
+  <a href="https://www.mongodb.com/"><img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB"/></a>
+  <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express"/></a>
+  <a href="https://socket.io/"><img src="https://img.shields.io/badge/Socket.IO-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white" alt="Socket.IO"/></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License"/></a>
+</p>
 
 </div>
 
 ---
 
-## Overview
+## 📌 About the Project
 
-Chatty is a full-stack real-time chat application designed to mirror a production-ready messaging platform. It combines a secure backend API, persistent MongoDB storage, live socket-based messaging, and a responsive React frontend powered by Vite and Tailwind CSS.
+**Chatty** is a full-stack real-time messaging application that replicates the core experience of modern chat products. It was built to demonstrate end-to-end proficiency across the MERN stack — from designing RESTful APIs and WebSocket event flows to building a polished, responsive React frontend.
 
-The project includes user authentication, online presence tracking, media sharing, profile customization, and a polished multi-theme UI that supports a modern messaging experience.
-
----
-
-## Key Features
-
-- Secure authentication with JWT and cookie-based session handling
-- Real-time messaging using Socket.IO
-- Online/offline user presence indicators
-- Image upload and sharing with Cloudinary
-- Profile photo updates and user personalization
-- Theme switching with DaisyUI and local persistence
-- Responsive chat interface for desktop and mobile layouts
-- Protected routes and middleware-based access control
-- Clean state handling with Zustand
+The application handles user authentication with JWTs, persists messages in MongoDB, delivers them instantly over Socket.IO, and stores media via Cloudinary — all within a single deployable Node.js service.
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+| Feature | Details |
+|---|---|
+| 🔐 **JWT Authentication** | Secure signup/login with HTTP-only cookie sessions |
+| 💬 **Real-time Messaging** | Bi-directional messaging powered by Socket.IO |
+| 🟢 **Online Presence** | Live online/offline status tracking across all users |
+| 🖼️ **Media Sharing** | Upload and send images via Cloudinary CDN |
+| 👤 **Profile Management** | Update profile picture and personal details |
+| 🎨 **32 Themes** | DaisyUI theme switcher with `localStorage` persistence |
+| 🛡️ **Protected Routes** | Middleware-enforced access control on all private endpoints |
+| 📱 **Responsive UI** | Mobile and desktop optimized layout with Tailwind CSS |
+| ⚡ **Optimistic UX** | Loading skeletons, toast notifications, and smooth transitions |
+
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
-
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- Socket.IO
-- JWT (JSON Web Tokens)
-- bcryptjs
-- Cloudinary
-- cookie-parser
-- cors
-- dotenv
+| Technology | Purpose |
+|---|---|
+| **Node.js** | JavaScript runtime |
+| **Express.js** | HTTP server and REST API framework |
+| **MongoDB + Mongoose** | NoSQL database and ODM |
+| **Socket.IO** | WebSocket-based real-time communication |
+| **JSON Web Tokens** | Stateless authentication |
+| **bcryptjs** | Password hashing |
+| **Cloudinary** | Cloud-based image storage and delivery |
+| **cookie-parser** | Cookie handling middleware |
+| **dotenv** | Environment variable management |
 
 ### Frontend
-
-- React 18
-- Vite
-- React Router DOM
-- Zustand
-- Axios
-- Socket.IO Client
-- Tailwind CSS
-- DaisyUI
-- Lucide React
-- React Hot Toast
+| Technology | Purpose |
+|---|---|
+| **React 18** | UI component library |
+| **Vite** | Fast development build tool |
+| **React Router DOM** | Client-side routing |
+| **Zustand** | Lightweight global state management |
+| **Axios** | HTTP client for REST API calls |
+| **Socket.IO Client** | Real-time WebSocket integration |
+| **Tailwind CSS** | Utility-first CSS framework |
+| **DaisyUI** | Tailwind component library with theming |
+| **Lucide React** | Icon library |
+| **React Hot Toast** | Toast notification system |
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-```text
-Client (React + Vite)
-        │
-        ├── REST API calls via Axios
-        │
-        ├── Socket.IO client for real-time events
-        │
-        ▼
-Express + Node.js API
-        │
-        ├── Auth routes and middleware
-        ├── Message routes and controllers
-        ├── Socket.IO server integration
-        ▼
-MongoDB (Mongoose models)
-        │
-        └── Cloudinary for media storage
+```
+┌──────────────────────────────────────────────────────────┐
+│                  CLIENT (React + Vite)                   │
+│                                                          │
+│   Zustand Stores ──► Axios (REST) ──► Express API        │
+│   Zustand Stores ──► Socket.IO Client ──► Socket Server  │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+                           │
+                HTTP (REST) + WS (WebSocket)
+                           │
+┌──────────────────────────────────────────────────────────┐
+│              SERVER (Node.js + Express)                  │
+│                                                          │
+│   Routes ──► Auth Middleware ──► Controllers             │
+│   Socket.IO Server ──► Event Handlers                    │
+│                                                          │
+│   ┌─────────────────────────────────────────┐            │
+│   │         MongoDB (Mongoose Models)       │            │
+│   │  User Collection | Message Collection   │            │
+│   └────────────────┬────────────────────────┘            │
+└────────────────────┼─────────────────────────────────────┘
+                     │
+        ┌────────────┴─────────────┐
+        │      MongoDB Atlas       │
+        │    (Cloud Database)      │
+        └────────────┬─────────────┘
+                     │
+        ┌────────────┴─────────────┐
+        │     Cloudinary CDN       │
+        │    (Image Storage)       │
+        └──────────────────────────┘
 ```
 
-This architecture keeps the frontend lightweight while ensuring chat communication, auth validation, and persistence remain fast and scalable for a single-service application.
+> In production, Express serves the compiled React build from `frontend/dist/`, unifying frontend and backend into a single deployable service.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-```text
+```
 fullstack-chat-app-master/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/
-│   │   │   ├── auth.controller.js
-│   │   │   └── message.controller.js
+│   │   │   ├── auth.controller.js       # Signup, login, logout, profile update
+│   │   │   └── message.controller.js    # Send & fetch messages
 │   │   ├── lib/
-│   │   │   ├── cloudinary.js
-│   │   │   ├── db.js
-│   │   │   ├── socket.js
-│   │   │   └── utils.js
+│   │   │   ├── cloudinary.js            # Cloudinary SDK config
+│   │   │   ├── db.js                    # MongoDB connection
+│   │   │   ├── socket.js                # Socket.IO server setup
+│   │   │   └── utils.js                 # JWT generation helper
 │   │   ├── middleware/
-│   │   │   └── auth.middleware.js
+│   │   │   └── auth.middleware.js       # JWT verification middleware
 │   │   ├── models/
-│   │   │   ├── message.model.js
-│   │   │   └── user.model.js
+│   │   │   ├── message.model.js         # Message schema
+│   │   │   └── user.model.js            # User schema
 │   │   ├── routes/
-│   │   │   ├── auth.route.js
-│   │   │   └── message.route.js
+│   │   │   ├── auth.route.js            # Auth endpoints
+│   │   │   └── message.route.js         # Messaging endpoints
 │   │   ├── seeds/
-│   │   │   └── user.seed.js
-│   │   └── index.js
-│   ├── package.json
-│   └── .env
+│   │   │   └── user.seed.js             # Seed data for development
+│   │   └── index.js                     # Application entry point
+│   ├── .env                             # Environment variables (not committed)
+│   └── package.json
 ├── frontend/
 │   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── constants/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   ├── store/
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── tailwind.config.js
-├── package.json
+│   └── src/
+│       ├── components/                  # Reusable UI components
+│       ├── constants/                   # App-wide constants (e.g., themes)
+│       ├── lib/                         # Axios instance, utilities
+│       ├── pages/                       # Route-level page components
+│       ├── store/                       # Zustand state stores
+│       ├── App.jsx                      # Root component with routing
+│       ├── index.css                    # Global styles
+│       └── main.jsx                     # React DOM entry point
+├── package.json                         # Root scripts for build/deployment
 ├── LICENSE
-├── README.md
-└── BUILDING_GUIDE.txt
+└── README.md
 ```
 
 ---
 
-## Prerequisites
+## 📡 API Reference
 
-Before running the project locally, make sure you have:
+### Authentication — `/api/auth`
 
-- Node.js 18+
-- npm 9+
-- MongoDB instance or MongoDB Atlas cluster
-- Cloudinary account for image uploads
-- Git
-
----
-
-## Getting Started
-
-### 1) Clone the repository
-
-```bash
-git clone https://github.com/your-username/chatty.git
-cd chatty
-```
-
-### 2) Install dependencies
-
-```bash
-npm install --prefix backend
-npm install --prefix frontend
-```
-
-### 3) Create environment variables
-
-Create a `.env` file in the `backend` directory with the following values:
-
-```env
-PORT=5001
-MONGODB_URI=mongodb://127.0.0.1:27017/chat_db
-JWT_SECRET=your_super_secret_key
-NODE_ENV=development
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-> Keep this file local and never commit it to source control.
-
-### 4) Start the application
-
-Run the backend:
-
-```bash
-npm run dev --prefix backend
-```
-
-Run the frontend in a second terminal:
-
-```bash
-npm run dev --prefix frontend
-```
-
-Then open the app in your browser at:
-
-```text
-http://localhost:5173
-```
-
----
-
-## Production Build
-
-From the root directory:
-
-```bash
-npm run build
-```
-
-This installs the backend and frontend dependencies, then builds the frontend bundle for production.
-
-To run the production server:
-
-```bash
-npm run start --prefix backend
-```
-
----
-
-## API Overview
-
-### Authentication
-
-- `POST /api/auth/signup` — Register a new user
-- `POST /api/auth/login` — Authenticate a user
-- `POST /api/auth/logout` — Clear the auth cookie
-- `GET /api/auth/check` — Validate the current session
-- `PUT /api/auth/update-profile` — Update profile details or image
-
-### Messaging
-
-- `GET /api/messages/users` — List available chat users
-- `GET /api/messages/:id` — Fetch message history with a specific user
-- `POST /api/messages/send/:id` — Send a text or image message
-
-These routes are protected by JWT middleware and are intended to support a real-time chat workflow with secure access control.
-
----
-
-## Real-Time Behavior
-
-The app uses Socket.IO for live interactions, including:
-
-- user connection tracking
-- online user updates
-- new message delivery to connected clients
-- event-driven updates without full page reloads
-
-This makes the chat experience feel immediate and close to a production messaging product.
-
----
-
-## UI and Experience
-
-The frontend is designed around a clean conversation-first layout, with:
-
-- sidebar-based contact list
-- active chat panel with message history
-- theme switching from the settings page
-- responsive layout using Tailwind CSS
-- toast feedback for user actions
-- loading skeletons for smoother visual transitions
-
----
-
-## Deployment Notes
-
-For deployment, configure the same environment variables and set `NODE_ENV=production` in your hosting platform.
-
-Recommended setup:
-
-- MongoDB Atlas for persistence
-- Cloudinary for image hosting
-- Render, Railway, or any Node-compatible hosting provider
-- HTTPS enabled for secure cookie transmission
-
----
-
-## Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your work with a clear message
-4. Push the branch and open a pull request
-
----
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
----
-
-<div align="center">
-
-Built with ❤️ using the MERN stack and real-time communication tools.
-
-</div>
-
-
-## 📡 API Endpoints
-
-### Authentication (`/api/auth`)
-
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Protected | Description |
 |---|---|---|---|
-| `POST` | `/api/auth/signup` | ❌ | Register a new user |
-| `POST` | `/api/auth/login` | ❌ | Login with email & password |
-| `POST` | `/api/auth/logout` | ❌ | Logout & clear JWT cookie |
+| `POST` | `/api/auth/signup` | ❌ | Register a new user account |
+| `POST` | `/api/auth/login` | ❌ | Authenticate and receive a JWT cookie |
+| `POST` | `/api/auth/logout` | ❌ | Clear the session cookie |
+| `GET` | `/api/auth/check` | ✅ | Validate the current session |
 | `PUT` | `/api/auth/update-profile` | ✅ | Update profile picture |
-| `GET` | `/api/auth/check` | ✅ | Verify authentication status |
 
-### Messaging (`/api/messages`)
+### Messaging — `/api/messages`
 
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Protected | Description |
 |---|---|---|---|
-| `GET` | `/api/messages/users` | ✅ | Get all users for sidebar (excludes self) |
-| `GET` | `/api/messages/:id` | ✅ | Get message history with a specific user |
-| `POST` | `/api/messages/send/:id` | ✅ | Send a text/image message to a user |
+| `GET` | `/api/messages/users` | ✅ | Fetch all users (excluding self) for sidebar |
+| `GET` | `/api/messages/:id` | ✅ | Retrieve message history with a specific user |
+| `POST` | `/api/messages/send/:id` | ✅ | Send a text or image message to a user |
 
-> ✅ = Requires JWT authentication via `protectRoute` middleware
+> ✅ Protected routes require a valid JWT passed via HTTP-only cookie, enforced by `protectRoute` middleware.
 
 ---
 
@@ -338,105 +186,122 @@ Built with ❤️ using the MERN stack and real-time communication tools.
 
 | Event | Direction | Payload | Description |
 |---|---|---|---|
-| `connection` | Client → Server | `{ userId }` via handshake query | User connects to socket server |
-| `disconnect` | Client → Server | — | User disconnects from socket server |
-| `getOnlineUsers` | Server → All Clients | `string[]` (user IDs) | Broadcasts updated list of online users |
-| `newMessage` | Server → Specific Client | `Message` object | Delivers a new message to the receiver |
+| `connection` | Client → Server | `{ userId }` via query | User connects and registers their socket |
+| `disconnect` | Client → Server | — | User disconnects, socket map is updated |
+| `getOnlineUsers` | Server → All Clients | `string[]` (user IDs) | Broadcasts current list of online users |
+| `newMessage` | Server → Receiver | `Message` object | Pushes a new message to the recipient in real time |
 
 ---
 
 ## 🎨 Theming
 
-Chatty supports **32 DaisyUI themes** with live preview. Users can switch themes from the **Settings** page, and the selection persists in `localStorage`.
+Chatty ships with **32 DaisyUI themes**. Users select a theme from the **Settings** page — the preference is persisted in `localStorage` and applied globally on load.
 
-Available themes include: `light`, `dark`, `cupcake`, `bumblebee`, `emerald`, `corporate`, `synthwave`, `retro`, `cyberpunk`, `valentine`, `halloween`, `garden`, `forest`, `aqua`, `lofi`, `pastel`, `fantasy`, `wireframe`, `black`, `luxury`, `dracula`, `cmyk`, `autumn`, `business`, `acid`, `lemonade`, `night`, `coffee`, `winter`, `dim`, `nord`, `sunset`.
+**Available themes:** `light`, `dark`, `cupcake`, `bumblebee`, `emerald`, `corporate`, `synthwave`, `retro`, `cyberpunk`, `valentine`, `halloween`, `garden`, `forest`, `aqua`, `lofi`, `pastel`, `fantasy`, `wireframe`, `black`, `luxury`, `dracula`, `cmyk`, `autumn`, `business`, `acid`, `lemonade`, `night`, `coffee`, `winter`, `dim`, `nord`, `sunset`
 
-Default theme: **`coffee`**
-
----
-
-## 🏗️ Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT (React)                       │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
-│  │  Zustand  │  │  Axios   │  │ Socket.IO│  │ React      │  │
-│  │  Stores   │  │  Client  │  │  Client  │  │ Router DOM │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────────────┘  │
-│       │              │             │                         │
-└───────┼──────────────┼─────────────┼─────────────────────────┘
-        │   REST API   │  WebSocket  │
-        │   (HTTP)     │  (WS)       │
-┌───────┼──────────────┼─────────────┼─────────────────────────┐
-│       │              │             │                         │
-│  ┌────▼─────┐  ┌─────▼────┐  ┌────▼─────┐                  │
-│  │ Express  │  │  Routes  │  │ Socket.IO│                  │
-│  │ Server   │  │  + Auth  │  │  Server  │                  │
-│  │          │  │ Middleware│  │          │                  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘                  │
-│       │              │             │                         │
-│  ┌────▼──────────────▼─────────────▼─────┐                  │
-│  │           Controllers                  │                  │
-│  │  (auth.controller + message.controller)│                  │
-│  └────────────────┬──────────────────────┘                  │
-│                   │                                          │
-│  ┌────────────────▼──────────────────────┐                  │
-│  │      MongoDB (Mongoose Models)         │                  │
-│  │   User Collection  |  Message Collection│                 │
-│  └────────────────┬──────────────────────┘                  │
-│                   │                                          │
-│              SERVER (Node.js + Express)                      │
-└───────────────────┼──────────────────────────────────────────┘
-                    │
-        ┌───────────▼───────────┐
-        │   MongoDB Atlas       │
-        │   (Cloud Database)    │
-        └───────────┬───────────┘
-                    │
-        ┌───────────▼───────────┐
-        │    Cloudinary CDN     │
-        │   (Image Storage)     │
-        └───────────────────────┘
-```
+**Default:** `coffee`
 
 ---
 
-## 📦 Deployment
+## 🚀 Getting Started
 
-### Production Build
+### Prerequisites
+
+- **Node.js** v18 or higher
+- **npm** v9 or higher
+- **MongoDB** — local instance or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster
+- **Cloudinary** account (for image upload functionality)
+
+### 1. Clone the Repository
 
 ```bash
-# From the root directory — installs all deps & builds frontend
+git clone https://github.com/your-username/chatty.git
+cd chatty
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file inside the `backend/` directory:
+
+```env
+PORT=5001
+MONGODB_URI=mongodb://127.0.0.1:27017/chat_db
+JWT_SECRET=your_strong_secret_key_here
+NODE_ENV=development
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+```
+
+> ⚠️ Never commit `.env` to version control. It is already listed in `.gitignore`.
+
+### 4. Run the Application
+
+**Start the backend** (runs on `http://localhost:5001`):
+
+```bash
+npm run dev --prefix backend
+```
+
+**Start the frontend** in a new terminal (runs on `http://localhost:5173`):
+
+```bash
+npm run dev --prefix frontend
+```
+
+Open **http://localhost:5173** in your browser.
+
+---
+
+## 📦 Production Build & Deployment
+
+### Build
+
+From the project root:
+
+```bash
 npm run build
 ```
 
-### Start Production Server
+This installs all dependencies and compiles the React frontend into `frontend/dist/`. Express then serves these static files in production.
+
+### Start the Production Server
 
 ```bash
-# Serves both API and built frontend from Express
 npm run start
 ```
 
-> In production mode, Express serves the React build from `frontend/dist/` and handles all API routes.
-
-### Deploy to Render / Railway / Heroku
+### Deploy to Render / Railway / Fly.io
 
 1. Set the **Build Command** to: `npm run build`
 2. Set the **Start Command** to: `npm run start`
-3. Add all environment variables from the [Environment Variables](#-environment-variables) section
+3. Add all environment variables listed above
 4. Set `NODE_ENV=production`
+
+**Recommended services:**
+- **Database:** [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+- **Media storage:** [Cloudinary](https://cloudinary.com)
+- **Hosting:** [Render](https://render.com), [Railway](https://railway.app), or any Node.js-compatible platform
+- **SSL/HTTPS:** Required for secure HTTP-only cookie transmission
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions are welcome!
 
 1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
+2. **Create** a feature branch: `git checkout -b feature/your-feature-name`
+3. **Commit** your changes: `git commit -m 'feat: add your feature'`
+4. **Push** to the branch: `git push origin feature/your-feature-name`
 5. **Open** a Pull Request
 
 ---
@@ -449,9 +314,8 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <div align="center">
 
-**Built with ❤️ using the MERN Stack**
+Built with ❤️ using the **MERN Stack** · Node.js · React · MongoDB · Socket.IO
 
-⭐ Star this repo if you found it helpful!
+⭐ If you found this project useful, please consider giving it a star!
 
 </div>
-]]>
